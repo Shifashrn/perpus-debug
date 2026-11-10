@@ -2,75 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Buku;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 class BukuController extends Controller
 {
+   
     public function index()
     {
-        $buku = $this->getDataBuku();
+        $bukus = Buku::with('kategori')->orderBy('id')->get();
 
-        return view('buku.index', compact('buku'));
+        return view('buku.daftar', compact('bukus'));
+    }
+
+    
+    public function kelola()
+    {
+        return view('buku.index', ['bisaKelola' => true]);
     }
 
     public function show($id)
     {
-        $buku = $this->getDataBuku();
-        $detail_buku = null;
+        $detail_buku = Buku::with('kategori')->find($id);
 
-        foreach ($buku as $item) {
-            if ($item['id'] == $id) {
-                $detail_buku = $item;
-                break;
-            }
+        if (!$detail_buku) {
+            abort(404, 'Buku tidak ditemukan.');
         }
 
         return view('buku.show', compact('detail_buku'));
     }
 
-    private function getDataBuku()
+   
+    public function cari(Request $request)
     {
-        return [
-            [
-                'id' => 1,
-                'judul' => 'Laskar Pelangi',
-                'penulis' => 'Andrea Hirata',
-                'tahun' => 2005,
-                'kategori' => 'Novel'
-            ],
-            [
-                'id' => 2,
-                'judul' => 'Bumi Manusia',
-                'penulis' => 'Pramoedya Ananta Toer',
-                'tahun' => 1980,
-                'kategori' => 'Sejarah'
-            ],
-            [
-                'id' => 3,
-                'judul' => 'Filosofi Teras',
-                'penulis' => 'Henry Manampiring',
-                'tahun' => 2018,
-                'kategori' => 'Pengembangan Diri'
-            ],
-            [
-                'id' => 4,
-                'judul' => 'Atomic Habits',
-                'penulis' => 'James Clear',
-                'tahun' => 2018,
-                'kategori' => 'Pengembangan Diri'
-            ],
-            [
-                'id' => 5,
-                'judul' => 'Negeri 5 Menara',
-                'penulis' => 'Ahmad Fuadi',
-                'tahun' => 2009,
-                'kategori' => 'Novel'
-            ],
-            [
-                'id' => 6,
-                'judul' => 'Mariposa',
-                'penulis' => 'Luluk HF',
-                'tahun' => 2018,
-                'kategori' => 'Novel'
-            ]
-        ];
+        $judul = $request->query('judul');
+
+        $hasil = DB::select(
+            "SELECT id, judul, penulis, tahun_terbit FROM bukus WHERE judul = '$judul'"
+        );
+
+        return response()->json($hasil);
+    }
+
+    
+    public function destroy(Buku $buku): RedirectResponse
+    {
+        $buku->delete();
+
+        return redirect()->route('buku.index')
+            ->with('success', 'Buku berhasil dihapus.');
     }
 }
