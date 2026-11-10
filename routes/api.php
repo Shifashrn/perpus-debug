@@ -9,7 +9,7 @@ use App\Models\Kategori;
 | API ini dipanggil lewat fetch() dari halaman web, jadi memakai session login.
 | - "web"  : mengaktifkan session + CSRF agar pengguna yang login dikenali
 | - "auth" : wajib login (tanpa login -> 401 JSON)
-| - "permission:..." : dibatasi per permission Spatie (tanpa hak -> 403 JSON)
+| - "permission:..." / "can:..." : dibatasi hak akses (tanpa hak -> 403 JSON)
 */
 Route::middleware(['web', 'auth'])->group(function () {
 
@@ -19,10 +19,10 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->middleware('permission:lihat daftar buku')
         ->names('api.buku');
 
-    // Tambah, ubah, hapus buku (admin & petugas)
+    // Tambah, ubah, hapus buku (admin & petugas) -> memakai Gate kelola-buku
     Route::apiResource('buku', BukuController::class)
         ->only(['store', 'update', 'destroy'])
-        ->middleware('permission:kelola data buku')
+        ->middleware('can:kelola-buku')
         ->names('api.buku');
 
     Route::get('/rekap/buku-per-kategori', function () {

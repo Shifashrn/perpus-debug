@@ -19,7 +19,7 @@
 
 <h3 class="section-title">Menu Cepat</h3>
 <div class="aksi-grup">
-    @can('kelola data buku')
+    @can('kelola-buku')
         <a href="{{ route('buku.kelola') }}" class="btn">Kelola Buku</a>
     @endcan
     @can('kelola peminjaman')

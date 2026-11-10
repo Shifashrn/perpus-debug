@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Anggota;
+use App\Models\User;
 use App\Policies\AnggotaPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -23,5 +24,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Anggota::class, AnggotaPolicy::class);
+
+        // Gate: hanya admin dan petugas yang boleh mengelola buku
+        Gate::define('kelola-buku', function (User $user) {
+            return $user->hasAnyRole(['admin', 'petugas']);
+        });
     }
 }
