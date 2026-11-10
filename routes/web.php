@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 | Halaman publik
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return view('home');
 })->name('home');
@@ -55,7 +56,7 @@ Route::middleware('auth')->group(function () {
     // Route Modul 6 (keamanan web dan otorisasi) ada di file terpisah.
     // File ini di-require DI DALAM group "auth", jadi semua route-nya
     // otomatis berada di balik middleware auth.
-    require __DIR__.'/modul6.php';
+    require __DIR__ . '/modul6.php';
 
     // Pengelolaan akun & role pengguna (khusus admin)
     Route::prefix('admin/pengguna')
@@ -127,4 +128,4 @@ Route::middleware('auth')->group(function () {
 });
 
 // Route registrasi, login, dan logout (Laravel Breeze)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

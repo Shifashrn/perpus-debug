@@ -7,19 +7,23 @@ use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Akun contoh (password semuanya: "password").
-     * Akun admin & petugas dibuat lewat seeder = mekanisme yang berwenang,
-     * bukan lewat formulir registrasi.
+     * Akun contoh.
+     * - Admin: password dibaca dari .env (SEED_ADMIN_PASSWORD), bukan "password" lagi.
+     * - Petugas & siswa: password contoh "password" (khusus untuk pengujian lokal).
      */
     public function run(): void
     {
-        $admin = User::firstOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@perpus.test'],
-            ['name' => 'Admin Perpustakaan', 'password' => Hash::make('password')]
+            [
+                'name' => 'Admin Perpustakaan',
+                'password' => Hash::make(env('SEED_ADMIN_PASSWORD') ?: Str::random(32)),
+            ]
         );
         $admin->syncRoles('admin');
 
