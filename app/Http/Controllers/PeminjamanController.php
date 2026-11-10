@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Peminjaman;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PeminjamanController extends Controller
@@ -21,12 +22,15 @@ class PeminjamanController extends Controller
         return view('peminjaman.index', compact('peminjamans'));
     }
 
-        /**
-     * A4 (RENTAN - IDOR): data diambil dari id di URL tanpa memeriksa pemilik.
+    /**
+     * A4 (DITAMBAL): Policy memeriksa pemilik sebelum data ditampilkan.
      */
     public function show($id): View
     {
         $peminjaman = Peminjaman::findOrFail($id);
+
+        // Admin & petugas: semua. Siswa: hanya miliknya sendiri (PeminjamanPolicy@view)
+        Gate::authorize('view', $peminjaman);
 
         return view('peminjaman.detail', compact('peminjaman'));
     }
